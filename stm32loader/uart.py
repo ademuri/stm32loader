@@ -43,6 +43,7 @@ class SerialConnection:
         self.swap_rts_dtr = False
         self.reset_active_high = False
         self.boot0_active_low = False
+        self.double_reset = False
 
         # don't connect yet; caller should use connect() separately
         self.serial_connection = None

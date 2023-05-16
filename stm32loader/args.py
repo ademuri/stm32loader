@@ -179,6 +179,13 @@ def parse_arguments(arguments):
     )
 
     parser.add_argument(
+        "-d",
+        "--double-reset",
+        action="store_true",
+        help="Double-tap reset line"
+    )
+
+    parser.add_argument(
         "-n", "--no-progress", action="store_true", help="Don't show progress bar."
     )
 

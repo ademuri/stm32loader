@@ -813,6 +813,11 @@ class Stm32Bootloader:
         """Enable or disable the reset IO line (if possible)."""
         if not hasattr(self.connection, "enable_reset"):
             return
+        if self.connection.double_reset:
+            self.connection.enable_reset(True)
+            time.sleep(0.01)
+            self.connection.enable_reset(False)
+            time.sleep(0.01)
         self.connection.enable_reset(True)
         time.sleep(0.1)
         self.connection.enable_reset(False)

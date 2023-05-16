@@ -87,6 +87,7 @@ class Stm32Loader:
         serial_connection.swap_rts_dtr = self.configuration.swap_rts_dtr
         serial_connection.reset_active_high = self.configuration.reset_active_high
         serial_connection.boot0_active_low = self.configuration.boot0_active_low
+        serial_connection.double_reset = self.configuration.double_reset
 
         show_progress = self._get_progress_bar(self.configuration.no_progress)
 
