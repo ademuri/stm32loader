@@ -817,7 +817,7 @@ class Stm32Bootloader:
             self.connection.enable_reset(True)
             time.sleep(0.01)
             self.connection.enable_reset(False)
-            time.sleep(0.01)
+            time.sleep(0.1)
         self.connection.enable_reset(True)
         time.sleep(0.1)
         self.connection.enable_reset(False)
