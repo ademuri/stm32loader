@@ -8,6 +8,17 @@ What changed in which version.
 uv, nox, bump-my-version, STM32G4, Python 3.12/3.13/3.14
 
 
+## [0.7.1] - 2023-10-18
+
+### Fixed
+* Integer division error when erasing specific region of flash.
+* Print erase/write/verify in correct order.
+
+
+### Cleaned
+* Extract method for range-to-pages calculation.
+
+
 ## [0.7.0] - 2023-10-12
 
 ### Added
