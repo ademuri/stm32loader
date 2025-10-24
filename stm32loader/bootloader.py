@@ -37,6 +37,9 @@ CHIP_IDS = {
     0x410: "STM32F10x Medium-density",
     0x420: "STM32F10x Medium-density value line",
     0x460: "STM32G0x1",
+    0x468: "STM32G431xx/STM32G441xx",
+    # 128 to 512 KiB,
+    0x469: "STM32G47xxx/48xxx",
     # 256 to 512 KiB (5128 Kbyte is probably a typo?)
     0x414: "STM32F10x High-density",
     0x428: "STM32F10x High-density value line",
@@ -243,6 +246,8 @@ class Stm32Bootloader:
         "WL": 0x1FFF7590,
         # ST BlueNRG has DIE_ID register with PRODUCT, but no UID.
         "NRG": None,
+        # ST RM0440 section 48.1 Unique device ID register (96 bits)
+        "G4": 0x1FFF7590,
     }
 
     UID_SWAP = [[1, 0], [3, 2], [7, 6, 5, 4], [11, 10, 9, 8]]
@@ -282,6 +287,8 @@ class Stm32Bootloader:
         "WL": 0x1FFF75E0,
         # ST BlueNRG-2 datasheet
         "NRG": 0x40100014,
+        # ST RM0440 section 48.2 Flash size data register
+        "G4": 0x1FFF75E0,
     }
 
     DATA_TRANSFER_SIZE = {
@@ -299,6 +306,7 @@ class Stm32Bootloader:
         "NRG": 256,
         # ST RM0433 section 4.2 FLASH main features
         "H7": 256,
+        "G4": 256,
     }
 
     FLASH_PAGE_SIZE = {
@@ -330,6 +338,8 @@ class Stm32Bootloader:
         "WL": 1024,
         # ST BlueNRG-2 data sheet: 128 pages of 8 * 64 * 4 bytes
         "NRG": 2048,
+        # ST RM0440 section 3.3.1 Flash memory organization
+        "G4": 2048, # this is valid only for dual bank mode
         # ST RM0433 section 4.2 FLASH main features
         "H7": 128 * 1024,
     }
