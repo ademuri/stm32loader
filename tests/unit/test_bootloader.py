@@ -213,7 +213,7 @@ def test_get_uid_for_known_family_reads_at_correct_address(connection, family):
     bootloader.read_memory = MagicMock()
     bootloader.get_uid()
     uid_address = bootloader.UID_ADDRESS[family]
-    assert bootloader.read_memory.called_once_with(uid_address)
+    bootloader.read_memory.assert_called_once_with(uid_address, 12)
 
 
 def test_get_uid_for_family_without_uid_returns_uid_not_supported(connection):
