@@ -20,6 +20,7 @@
 """Talk to an STM32 native bootloader (see ST AN3155)."""
 
 import enum
+import functools
 import math
 import operator
 import struct
@@ -698,19 +699,41 @@ class Stm32Bootloader:
             self.connection.timeout = previous_timeout_value
         self.debug(10, "    Extended Erase memory done")
 
-    def write_protect(self, pages):
+    def write_protect(self, pages=None):
         """Enable write protection on the given flash pages."""
-        self.command(self.Command.WRITE_PROTECT, "Write protect")
+        self.debug(10, "Enabling write protection")
+        flash_size, _uid = self.get_flash_size_and_uid()
+        if pages is None:
+            if flash_size is None:
+                raise Stm32LoaderError(
+                    "Cannot determine flash size for this device family "
+                    "to protect all pages. Please specify pages manually."
+                )
+            pages = list(range(flash_size * 1024 // self.flash_page_size))
+
+        if any(p > 255 for p in pages):
+            raise PageIndexError("Write protection only supports sector codes up to 255.")
+
         nr_of_pages = (len(pages) - 1) & 0xFF
+        self.debug(20, f"Write protecting {pages}, {nr_of_pages} pages, flash size: {flash_size}")
+
+        self.command(self.Command.WRITE_PROTECT, "Write protect")
         page_numbers = bytearray(pages)
         checksum = reduce(operator.xor, page_numbers, nr_of_pages)
         self.write_and_ack("0x63 write protect failed", nr_of_pages, page_numbers, checksum)
+
+        time.sleep(0.1)
+        self.reset_from_system_memory()
         self.debug(10, "    Write protect done")
 
     def write_unprotect(self):
         """Disable write protection of the flash memory."""
+        self.debug(10, "Disabling write protection")
         self.command(self.Command.WRITE_UNPROTECT, "Write unprotect")
         self._wait_for_ack("0x73 write unprotect failed")
+
+        time.sleep(0.1)
+        self.reset_from_system_memory()
         self.debug(10, "    Write Unprotect done")
 
     def readout_protect(self):

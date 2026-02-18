@@ -132,6 +132,16 @@ class Stm32Loader:
                 self.debug(0, "Quit")
                 self.stm32.reset_from_flash()
                 sys.exit(1)
+
+        if self.configuration.write_unprotect:
+            try:
+                self.stm32.write_unprotect()
+            except bootloader.CommandError:
+                self.debug(0, "Flash write unprotect failed")
+                self.debug(0, "Quit")
+                self.stm32.reset_from_flash()
+                sys.exit(1)
+
         if self.configuration.erase:
             try:
                 if self.configuration.length is None:
@@ -155,6 +165,16 @@ class Stm32Loader:
                 sys.exit(1)
         if self.configuration.write:
             self.stm32.write_memory_data(self.configuration.address, binary_data)
+
+        if self.configuration.write_protect:
+            try:
+                self.stm32.write_protect(pages=None)
+            except bootloader.CommandError:
+                self.debug(0, "Flash write protect failed")
+                self.debug(0, "Quit")
+                self.stm32.reset_from_flash()
+                sys.exit(1)
+
         if self.configuration.verify:
             read_data = self.stm32.read_memory_data(self.configuration.address, len(binary_data))
             try:

@@ -186,9 +186,28 @@ def test_extended_erase_memory_with_pages_sends_two_byte_sector_addresses_with_s
     assert write.data_was_written(b'\x00\x01\x00\x02\x00\x04\x0f\xf0\xfb')
 
 
-def test_write_protect_sends_page_addresses_and_checksum(bootloader, write):
+def test_write_protect_sends_command_page_addresses_and_checksum(bootloader, write):
+    bootloader.get_flash_size_and_uid = MagicMock()
+    bootloader.get_flash_size_and_uid.return_value = (16, 0x01)
     bootloader.write_protect([0x01, 0x08])
-    assert write.data_was_written(b'\x01\x08\x08')
+    assert write.data_was_written(b'\x63'), write.written_data
+    assert write.data_was_written(b'\x01\x08\x08'), write.written_data
+    assert write.data_was_written(bytearray([Stm32Bootloader.Command.SYNCHRONIZE])), write.written_data
+
+
+def test_write_protect_no_pages_specified(bootloader, write):
+    bootloader.get_flash_size_and_uid = MagicMock()
+    bootloader.get_flash_size_and_uid.return_value = (3, 0x01)
+    bootloader.write_protect()
+    assert write.data_was_written(b'\x63'), write.written_data
+    assert write.data_was_written(b'\x00\x01\x02\x01'), write.written_data
+    assert write.data_was_written(bytearray([Stm32Bootloader.Command.SYNCHRONIZE])), write.written_data
+
+
+def test_write_unprotect_sends_command(bootloader, write):
+    bootloader.write_unprotect()
+    assert write.data_was_written(b'\x73'), write.written_data
+    assert write.data_was_written(bytearray([Stm32Bootloader.Command.SYNCHRONIZE])), write.written_data
 
 
 def test_verify_data_with_identical_data_passes():

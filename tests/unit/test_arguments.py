@@ -43,3 +43,7 @@ def test_parse_arguments_erase_without_port_complains_about_missing_argument(pro
         pytest.skip("Not sure why nothing is captured in some pytest runs?")
     assert "arguments are required: -p/--port" in error_output
     assert "STM32LOADER_SERIAL_PORT" in error_output
+
+
+def test_parse_arguments_write_protect_unprotect(program):
+    program.parse_arguments(["--write-protect", "--unprotect"])
