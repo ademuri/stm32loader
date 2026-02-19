@@ -186,6 +186,40 @@ def test_extended_erase_memory_with_pages_sends_two_byte_sector_addresses_with_s
     assert write.data_was_written(b'\x00\x01\x00\x02\x00\x04\x0f\xf0\xfb')
 
 
+def test_get_write_protect_sectors_f1(connection):
+    bootloader = Stm32Bootloader(connection, device_family="F1")
+    # F1 has 4KB write protect sectors.
+    # 64KB / 4KB = 16 sectors.
+    assert bootloader._get_write_protect_sectors(64) == list(range(16))
+
+
+def test_get_write_protect_sectors_f4_512k(connection):
+    bootloader = Stm32Bootloader(connection, device_family="F4")
+    # F4: 0-3: 16KB (64KB), 4: 64KB (128KB), 5-11: 128KB (1024KB)
+    # 512KB means 4 sectors (64KB) + 1 sector (64KB) + (512-128)/128 = 3 sectors (384KB)
+    # total 8 sectors
+    assert bootloader._get_write_protect_sectors(512) == list(range(8))
+
+
+def test_get_write_protect_sectors_f4_1024k(connection):
+    bootloader = Stm32Bootloader(connection, device_family="F4")
+    # 1024KB = 12 sectors
+    assert bootloader._get_write_protect_sectors(1024) == list(range(12))
+
+
+def test_get_write_protect_sectors_f4_2048k(connection):
+    bootloader = Stm32Bootloader(connection, device_family="F4")
+    # 2048KB = 24 sectors
+    assert bootloader._get_write_protect_sectors(2048) == list(range(24))
+
+
+def test_get_write_protect_sectors_f7_1024k(connection):
+    bootloader = Stm32Bootloader(connection, device_family="F7")
+    # F7: 0-3: 32KB (128KB), 4: 128KB (256KB), 5-7: 256KB (1024KB)
+    # 1024KB = 8 sectors
+    assert bootloader._get_write_protect_sectors(1024) == list(range(8))
+
+
 def test_write_protect_sends_command_page_addresses_and_checksum(bootloader, write):
     bootloader.get_flash_size_and_uid = MagicMock()
     bootloader.get_flash_size_and_uid.return_value = (16, 0x01)
@@ -197,10 +231,14 @@ def test_write_protect_sends_command_page_addresses_and_checksum(bootloader, wri
 
 def test_write_protect_no_pages_specified(bootloader, write):
     bootloader.get_flash_size_and_uid = MagicMock()
-    bootloader.get_flash_size_and_uid.return_value = (3, 0x01)
+    # Default family is F1, sector size is 4096
+    bootloader.get_flash_size_and_uid.return_value = (4, 0x01)
     bootloader.write_protect()
     assert write.data_was_written(b'\x63'), write.written_data
-    assert write.data_was_written(b'\x00\x01\x02\x01'), write.written_data
+    # 4KB / 4KB = 1 sector (index 0)
+    # nr_of_pages = 1 - 1 = 0
+    # checksum = 0 ^ 0 = 0
+    assert write.data_was_written(b'\x00\x00\x00'), write.written_data
     assert write.data_was_written(bytearray([Stm32Bootloader.Command.SYNCHRONIZE])), write.written_data
 
 
