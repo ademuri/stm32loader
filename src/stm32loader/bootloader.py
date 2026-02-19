@@ -28,6 +28,8 @@ import sys
 import time
 from functools import lru_cache, reduce
 
+from stm32loader import devices
+
 CHIP_IDS = {
     # see ST AN2606 Table 136 Bootloader device-dependent parameters
     # 16 to 32 KiB
@@ -343,21 +345,7 @@ class Stm32Bootloader:
         # ST RM0433 section 4.2 FLASH main features
         "H7": 128 * 1024,
     }
-
-    # Size of the Flash memory sector used when executing the Write Protect command.
-    # See ST AN2606.
-    WRITE_PROTECT_SECTOR_SIZE = {
-        "default": 1024,
-        "F0": 4 * 1024,
-        "F1": 4 * 1024,
-        "F3": 4 * 1024,
-        "L0": 4 * 1024,
-        "L4": 2 * 1024,
-        "G0": 2 * 1024,
-        "G4": 2 * 1024,
-        "WL": 2 * 1024,
-    }
-
+    
     SYNCHRONIZE_ATTEMPTS = 2
 
     def __init__(self, connection, device_family=None, verbosity=5, show_progress=None):
@@ -373,22 +361,26 @@ class Stm32Bootloader:
         but a straight pyserial serial.Serial object can also be used.
 
         :param connection: Object supporting read() and write().
-          E.g. serial.Serial().
-        :param int verbosity: Verbosity level. 0 is quite, 10 is verbose.
+            E.g. serial.Serial().
+        :param int verbosity: Verbosity level. 0 is quiet, 10 is verbose.
         :param ShowProgress show_progress: ShowProgress context manager.
-           Set to None to disable progress bar output.
+            Set to None to disable progress bar output.
         """
         self.connection = connection
         self.verbosity = verbosity
         self.show_progress = show_progress or ShowProgress(None)
         self.extended_erase = False
         self.device_family = device_family or "F1"
-        self.data_transfer_size = self.DATA_TRANSFER_SIZE.get(self.device_family, self.DATA_TRANSFER_SIZE["default"])
-        self.flash_page_size = self.FLASH_PAGE_SIZE.get(self.device_family, self.FLASH_PAGE_SIZE["default"])
-        self.write_protect_sector_size = self.WRITE_PROTECT_SECTOR_SIZE.get(
-            self.device_family, self.WRITE_PROTECT_SECTOR_SIZE["default"]
+        self.data_transfer_size = self.DATA_TRANSFER_SIZE.get(
+            self.device_family, self.DATA_TRANSFER_SIZE["default"]
         )
-
+        self.flash_page_size = self.FLASH_PAGE_SIZE.get(
+            self.device_family, self.FLASH_PAGE_SIZE["default"]
+        )
+        self.write_protect_sector_size = devices.WRITE_PROTECT_SECTOR_SIZE.get(
+            self.device_family, devices.WRITE_PROTECT_SECTOR_SIZE["default"]
+        )
+                
     def write(self, *data):
         """Write the given data to the MCU."""
         for data_bytes in data:
@@ -716,55 +708,6 @@ class Stm32Bootloader:
             self.connection.timeout = previous_timeout_value
         self.debug(10, "    Extended Erase memory done")
 
-    def _get_write_protect_sectors(self, flash_size):
-        """Return the list of sector indices to protect for the given flash size."""
-        if self.device_family == "F4":
-            # F405/415/407/417 and F42x/43x:
-            # Bank 1:
-            # Sectors 0-3: 16KB
-            # Sector 4: 64KB
-            # Sectors 5-11: 128KB
-            # Total Bank 1: 1024KB, 12 sectors
-            if flash_size <= 1024:
-                if flash_size <= 64:
-                    sector_count = flash_size // 16
-                elif flash_size <= 128:
-                    sector_count = 5
-                else:
-                    sector_count = 5 + (flash_size - 128) // 128
-            else:
-                # Dual bank. Bank 2 (12-23) repeats the pattern.
-                bank2_size = flash_size - 1024
-                if bank2_size <= 64:
-                    bank2_sectors = bank2_size // 16
-                elif bank2_size <= 128:
-                    bank2_sectors = 5
-                else:
-                    bank2_sectors = 5 + (bank2_size - 128) // 128
-                sector_count = 12 + bank2_sectors
-                if sector_count > 24:
-                    sector_count = 24
-            return list(range(sector_count))
-
-        if self.device_family == "F7":
-            # F74x/75x:
-            # Sectors 0-3: 32KB
-            # Sector 4: 128KB
-            # Sectors 5-7: 256KB
-            if flash_size <= 128:
-                sector_count = flash_size // 32
-            elif flash_size <= 256:
-                sector_count = 5
-            else:
-                sector_count = 5 + (flash_size - 256) // 256
-            return list(range(sector_count))
-
-        if self.device_family == "H7":
-            # H7: banks of 128KB sectors.
-            return list(range((flash_size + 127) // 128))
-
-        return list(range(flash_size * 1024 // self.write_protect_sector_size))
-
     def write_protect(self, pages=None):
         """Enable write protection on the given flash pages."""
         self.debug(10, "Enabling write protection")
@@ -776,7 +719,7 @@ class Stm32Bootloader:
                     "to protect all pages. Please specify pages manually."
                 )
 
-            pages = self._get_write_protect_sectors(flash_size)
+            pages = devices.get_write_protect_sectors(self.device_family, flash_size)
 
             self.debug(
                 10,
