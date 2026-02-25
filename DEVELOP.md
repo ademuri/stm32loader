@@ -26,11 +26,11 @@ Run pytest.
     
 ## Linting
 
-Run flake8, pylint and black.
+Run ruff and pylint.
 
-    flake8 stm32loader
+    ruff check stm32loader
+    ruff format --check stm32loader
     pylint stm32loader
-    black --check stm32loader 
     
     
 ## Commit messages
