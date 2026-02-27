@@ -12,8 +12,8 @@ from nox_uv import session
 options.default_venv_backend = "uv"
 
 
-PYTHON_VERSIONS = ["3.9", "3.10", "3.11"]
-DEFAULT_PYTHON_VERSION = "3.11"
+PYTHON_VERSIONS = ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+DEFAULT_PYTHON_VERSION = "3.14"
 
 
 @session(python=PYTHON_VERSIONS, uv_groups=("test", "hex"))
