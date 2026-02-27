@@ -31,16 +31,25 @@ version = "0.8.0"
 requires = ["uv_build>=0.9.17,<0.10.0"]
 build-backend = "uv_build"
 
-[project.optional-dependencies]
+[dependency-groups]
 hex = [
     "intelhex",
 ]
+lint = [
+    "ruff",
+    "pylint",
+]
+test = [
+    "pytest",
+]
 dev = [
+    "pytest",
     "ruff",
     "pylint",
     "bump-my-version",
-    "nox",
     "cogapp",
+    "nox>=2026.2.9",
+    "nox-uv>=0.7.1",
 ]
 
 [project.scripts]

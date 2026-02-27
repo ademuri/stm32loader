@@ -6,47 +6,29 @@ Usage:
     uv run nox
 """
 
-from shutil import rmtree
+from nox import Session, options
+from nox_uv import session
 
-import nox
+options.default_venv_backend = "uv"
 
 
+PYTHON_VERSIONS = ["3.9", "3.10", "3.11"]
 DEFAULT_PYTHON_VERSION = "3.11"
-ALL_PYTHON_VERSIONS = ["3.9", "3.10", "3.11"]
 
 
-@nox.session(python=ALL_PYTHON_VERSIONS)
-def tests(session):
-    """
-    Install stm32loader package and execute unit tests.
-
-    Use chdir to move off of the current folder, so that
-    'import stm32loader' imports the *installed* package, not
-    the local one from the repo.
-    """
-    # setuptools does not like multiple .whl packages being present
-    # see https://github.com/pypa/setuptools/issues/1671
-    rmtree("./dist", ignore_errors=True)
-    session.install(".")
-    session.install("intelhex")
-    session.install("pytest")
-    session.chdir("tests")
-    session.run("pytest", "./")
+@session(python=PYTHON_VERSIONS, uv_groups=("test", "hex"))
+def tests(session: Session) -> None:
+    """Execute unit tests."""
+    session.run("pytest")
 
 
-@nox.session(python=DEFAULT_PYTHON_VERSION)
-def lint(session):
+@session(python=DEFAULT_PYTHON_VERSION, uv_groups=("lint", ))
+def lint(session: Session) -> None:
     """
     Run code verification tools ruff and pylint.
 
     Do this in order of expected failures for performance reasons.
     """
-    session.install("ruff")
-    session.run("ruff", "format", "--check", "stm32loader")
-    session.run("ruff", "check", "stm32loader")
-
-    session.install("pylint")
-    # pyserial for avoiding a complaint by pylint
-    session.install("pyserial")
-    session.install("intelhex")
+    session.run("ruff", "format", "--check", "src/stm32loader")
+    session.run("ruff", "check", "src/stm32loader")
     session.run("pylint", "stm32loader")
