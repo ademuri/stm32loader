@@ -35,7 +35,12 @@ Run ruff and pylint.
     uv run ruff check stm32loader
     uv run ruff format --check stm32loader
     uv run pylint stm32loader
-    
+
+
+## Updating --help info in the README
+
+    uv run cog -r README.md
+
     
 ## Commit messages
 
