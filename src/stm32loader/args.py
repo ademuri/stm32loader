@@ -143,7 +143,7 @@ def parse_arguments(arguments):
         default=default_family,
         help=(
             "Device family to read out device UID and flash size; "
-            "e.g F1 for STM32F1xx. Possible values: F0, F1, F3, F4, F7, H7, L4, L0, G0, NRG."
+            "e.g F1 for STM32F1xx. Possible values: F0, F1, F3, F4, F7, H7, L4, L0, G0, G4, NRG."
             + ("." if default_family else " (default: $STM32LOADER_FAMILY).")
         ),
     )
