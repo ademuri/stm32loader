@@ -32,7 +32,7 @@ class HelpFormatter(argparse.RawDescriptionHelpFormatter, argparse.ArgumentDefau
                 action.required = True
             return action
 
-        return super()._format_actions_usage(map(tweak_action, actions), groups)
+        return super()._format_actions_usage(map(tweak_action, actions), groups)  # pylint: disable=no-member
 
 
 def _auto_int(x):

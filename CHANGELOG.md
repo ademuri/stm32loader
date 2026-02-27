@@ -3,6 +3,11 @@
 What changed in which version.
 
 
+## vnext
+
+uv, nox, bump-my-version, STM32G4, Python 3.12/3.13/3.14
+
+
 ## [0.7.0] - 2023-10-12
 
 ### Added
