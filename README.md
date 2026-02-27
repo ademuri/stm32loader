@@ -15,7 +15,12 @@ for Wiznet W7500.
 Compatible with Python version 3.9 to 3.11 and PyPy 3.9.
 
 
-## Installation
+## Run using `uvx`
+
+    uvx stm32loader
+
+
+## Installation with pip
 
     pip install stm32loader
 

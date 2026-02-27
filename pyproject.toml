@@ -1,21 +1,13 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
 [project]
 name = "stm32loader"
+description = "Flash firmware to STM32 microcontrollers using Python."
+readme = "README.md"
 authors = [
     {name = "jsnyder"},
     {name = "Floris Lambrechts", email = "florisla@gmail.com"},
 ]
-readme = "README.md"
-description = "Flash firmware to STM32 microcontrollers using Python."
-license = {file = "LICENSE"}
 requires-python = ">=3.9"
-dependencies = [
-    "pyserial",
-    "progress",
-]
+license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python",
@@ -23,25 +15,41 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Natural Language :: English",
     "Operating System :: OS Independent",
 ]
-dynamic = ["version"]
+dependencies = [
+    "pyserial",
+    "progress",
+]
+version = "0.8.0"
 
-[project.optional-dependencies]
+[build-system]
+requires = ["uv_build>=0.9.17,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
 hex = [
     "intelhex",
 ]
-dev = [
-    "wheel",
-    "twine",
-    "pylint",
+lint = [
     "ruff",
+    "pylint",
+]
+test = [
+    "pytest",
+]
+dev = [
+    "pytest",
+    "ruff",
+    "pylint",
     "bump-my-version",
-    "nox",
     "cogapp",
+    "nox>=2026.2.9",
+    "nox-uv>=0.7.1",
 ]
 
 [project.scripts]

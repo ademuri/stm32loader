@@ -7,8 +7,12 @@
 Checkout the latest master.
 
     git clone https://github.com/florisla/stm32loader.git
-    
-Install in editable mode with development tools (preferable in a virtual
+
+Using `uv` you can simply run the tool
+
+    uv run stm32loader
+
+Otherwise, install in editable mode with development tools (preferable in a virtual
 environment).
 
     python -m venv .venv
@@ -21,16 +25,16 @@ environment).
 
 Run pytest.
 
-    pytest .
+    uv run pytest .
     
     
 ## Linting
 
 Run ruff and pylint.
 
-    ruff check stm32loader
-    ruff format --check stm32loader
-    pylint stm32loader
+    uv run ruff check stm32loader
+    uv run ruff format --check stm32loader
+    uv run pylint stm32loader
     
     
 ## Commit messages
@@ -41,7 +45,7 @@ see https://www.conventionalcommits.org/ .
     
 ## Bump the version number
 
-    bumpversion --new-version 1.0.8-dev bogus-part
+    bump-my-version --new-version 1.0.8-dev bogus-part
     
     
 ## Tag a release
