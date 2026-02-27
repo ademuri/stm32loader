@@ -31,19 +31,16 @@ def tests(session):
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def lint(session):
     """
-    Run code verification tools flake8, pylint and black.
+    Run code verification tools ruff and pylint.
 
     Do this in order of expected failures for performance reasons.
     """
-    session.install("black")
-    session.run("black", "--check", "stm32loader")
+    session.install("ruff")
+    session.run("ruff", "format", "--check", "stm32loader")
+    session.run("ruff", "check", "stm32loader")
 
     session.install("pylint")
     # pyserial for avoiding a complaint by pylint
     session.install("pyserial")
     session.install("intelhex")
     session.run("pylint", "stm32loader")
-
-    session.install("flake8", "flake8-isort")
-    # not sure why this needs an explicit --config
-    session.run("flake8", "stm32loader", "--config=setup.cfg")

@@ -25,7 +25,6 @@ Offer support for toggling RESET and BOOT0.
 
 # Note: this file not named 'serial' because that name-clashed in Python 2
 
-
 import serial
 
 

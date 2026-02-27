@@ -38,9 +38,7 @@ dev = [
     "wheel",
     "twine",
     "pylint",
-    "flake8",
-    "flake8-isort",
-    "black",
+    "ruff",
     "bump-my-version",
     "nox",
     "cogapp",
@@ -84,23 +82,28 @@ search = "__version_info__ = {current_version}"
 replace = "__version_info__ = {new_version}"
 
 
-[tool.black]
+[tool.ruff]
 line-length = 98
-target-version = [
-    "py39",
-    "py310",
-    "py311",
+target-version = "py39"
+exclude = [
+    ".git",
+    ".idea",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
 ]
-exclude = '''
-/(
-    \.git
-  | \.idea
-  | __pycache__
-  | build
-  | dist
-  | .*\.egg-info
-)/
-'''
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort
+# Replaces flake8 + flake8-isort; ruff format replaces black
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 78
+
+[tool.ruff.format]
+docstring-code-format = true
 
 
 [tool.pytest.ini_options]
@@ -109,8 +112,3 @@ markers = [
     "hardware",
     "missing_hardware",
 ]
-
-
-[tool.isort]
-line_length = 98
-multi_line_output = 2
