@@ -52,6 +52,13 @@ Java library allowing to flash STM32 microcontrollers over UART.
 https://github.com/grevaillot/stm32flash-lib
 
 
+## stm32isp.py
+
+Simple, more limited too to flash STM32 over UART in Python.
+
+https://github.com/wagiminator/MCU-Flash-Tools?tab=readme-ov-file#stm32isp
+
+
 ## GigaDevice tools
 
 GigaDevice offers the GD-Link Programmer to work with the GD-Link debug adapter,
