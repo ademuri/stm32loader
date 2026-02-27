@@ -1,4 +1,10 @@
-"""Run unit tests in a fresh virtualenv using nox."""
+"""
+Run unit tests in a fresh virtualenv using nox.
+
+Usage:
+
+    uv run nox
+"""
 
 from shutil import rmtree
 
